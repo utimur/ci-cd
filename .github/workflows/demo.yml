@@ -2,12 +2,37 @@ name: learn-github-actions
 run-name: ${{ github.actor }} is learning GitHub Actions
 on: [push]
 jobs:
-  check-bats-version:
+  init:
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node-version: [18.x]
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v3
+      - uses: actions/checkout@v3
+      - name: Staring Node.js ${{matrix.node-version}}
+        uses: actions/setup-node@v3
         with:
-          node-version: "14"
-      - run: npm install -g bats
-      - run: bats -v
+          node-version: ${{ matrix.node-version }}
+      - name: install modules
+        run: npm install
+
+      - name: build project
+        run: npm run build
+
+      - name: Build Storybook
+        run: npm run build:storybook
+
+      - name: Run Unit Tests
+        run: npm run test:unit
+
+      - name: Run E2E Tests
+        run: npm run test:e2e
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Type Check
+        run: npm run type:check
+
+      - name: I18n Check
+        run: npm run i18n:check
